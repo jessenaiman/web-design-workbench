@@ -2,6 +2,7 @@
 
 import { cn } from '@ui/lib/utils';
 import { type MotionStyle, type Transition, motion } from 'motion/react';
+import type * as React from 'react';
 
 interface BorderBeamProps {
   /**
