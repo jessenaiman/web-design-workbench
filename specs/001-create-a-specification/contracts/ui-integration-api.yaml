@@ -1,0 +1,190 @@
+# API Contract: UI Library Integration Service
+
+**Version**: 1.0.0
+**Date**: September 11, 2025
+**Status**: Draft
+
+## Overview
+API contract for managing UI library integration (shadcn, magicui, animate-ui, reacbits) in the turborepo structure.
+
+## Endpoints
+
+### GET /api/ui/libraries
+Retrieve installed UI libraries and their status.
+
+**Request**:
+```http
+GET /api/ui/libraries
+Accept: application/json
+```
+
+**Response**:
+```json
+{
+  "libraries": [
+    {
+      "name": "shadcn",
+      "version": "string",
+      "status": "installed|pending|error",
+      "components": ["number"]
+    },
+    {
+      "name": "magicui",
+      "version": "string",
+      "status": "installed|pending|error",
+      "components": ["number"]
+    }
+  ],
+  "packages": {
+    "ui": "/packages/ui",
+    "totalComponents": "number"
+  }
+}
+```
+
+### POST /api/ui/libraries/install
+Install UI libraries in packages/ui.
+
+**Request**:
+```http
+POST /api/ui/libraries/install
+Content-Type: application/json
+
+{
+  "libraries": ["shadcn", "magicui", "animate-ui", "reacbits"],
+  "target": "packages/ui"
+}
+```
+
+**Response**:
+```json
+{
+  "installationId": "string",
+  "status": "initiated",
+  "libraries": [
+    {
+      "name": "shadcn",
+      "status": "pending",
+      "estimatedTime": "number"
+    }
+  ]
+}
+```
+
+### GET /api/ui/components
+Retrieve available UI components from installed libraries.
+
+**Request**:
+```http
+GET /api/ui/components?library={name}
+Accept: application/json
+```
+
+**Response**:
+```json
+{
+  "library": "shadcn",
+  "components": [
+    {
+      "name": "Button",
+      "category": "ui",
+      "status": "available",
+      "dependencies": ["radix-ui"],
+      "usage": "import { Button } from '@/components/ui/button'"
+    }
+  ],
+  "total": "number"
+}
+```
+
+### POST /api/ui/components/validate
+Validate component compatibility and dependencies.
+
+**Request**:
+```http
+POST /api/ui/components/validate
+Content-Type: application/json
+
+{
+  "components": ["Button", "Card", "Navigation"],
+  "target": "apps/web"
+}
+```
+
+**Response**:
+```json
+{
+  "validationId": "string",
+  "status": "passed|failed|warnings",
+  "results": [
+    {
+      "component": "Button",
+      "status": "passed",
+      "warnings": []
+    }
+  ],
+  "summary": {
+    "passed": "number",
+    "failed": "number",
+    "warnings": "number"
+  }
+}
+```
+
+## Data Models
+
+### UILibrary
+```typescript
+interface UILibrary {
+  name: 'shadcn' | 'magicui' | 'animate-ui' | 'reacbits';
+  version: string;
+  status: 'installed' | 'pending' | 'error';
+  components: number;
+}
+```
+
+### ComponentInfo
+```typescript
+interface ComponentInfo {
+  name: string;
+  category: string;
+  status: 'available' | 'unavailable';
+  dependencies: string[];
+  usage: string;
+}
+```
+
+### ValidationResult
+```typescript
+interface ValidationResult {
+  validationId: string;
+  status: 'passed' | 'failed' | 'warnings';
+  results: ComponentValidation[];
+  summary: {
+    passed: number;
+    failed: number;
+    warnings: number;
+  };
+}
+```
+
+## Validation Rules
+
+- Library names must be from approved list
+- Component names must exist in libraries
+- Target paths must be valid turborepo packages
+- Dependencies must be resolvable
+- Installation IDs must be UUIDs
+
+## Integration Requirements
+
+- All libraries must use Radix UI as foundation
+- Components must be hosted in packages/ui
+- Local web components must use proper aliases
+- Configuration files must remain unmodified
+- Testing must validate component functionality
+
+---
+
+*Contract generated from functional requirements FR-019, FR-020, FR-021 - Phase 1 execution*</content>
+<parameter name="filePath">/home/dice-wizard/dev/web-design-workbench/specs/001-create-a-specification/contracts/ui-integration-api.yaml

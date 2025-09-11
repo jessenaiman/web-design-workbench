@@ -1,0 +1,158 @@
+# API Contract: Component Migration Service
+
+**Version**: 1.0.0
+**Date**: September 11, 2025
+**Status**: Draft
+
+## Overview
+API contract for migrating components from magic-template repository to the turborepo structure.
+
+## Endpoints
+
+### GET /api/components/landing-page
+Retrieve the current landing page component configuration.
+
+**Request**:
+```http
+GET /api/components/landing-page
+Accept: application/json
+```
+
+**Response**:
+```json
+{
+  "component": {
+    "id": "string",
+    "name": "landing-page",
+    "source": "magic-template",
+    "status": "migrated|pending|error",
+    "dependencies": ["string"],
+    "integrationPoints": ["layout.tsx", "page.tsx"]
+  },
+  "metadata": {
+    "migratedAt": "2025-09-11T00:00:00Z",
+    "version": "1.0.0"
+  }
+}
+```
+
+**Error Responses**:
+- `404`: Component not found
+- `500`: Migration error
+
+### POST /api/components/migrate
+Initiate migration of components from magic-template.
+
+**Request**:
+```http
+POST /api/components/migrate
+Content-Type: application/json
+
+{
+  "source": "https://github.com/jessenaiman/magic-template",
+  "components": ["landing-page", "navigation"],
+  "target": "packages/ui"
+}
+```
+
+**Response**:
+```json
+{
+  "migrationId": "string",
+  "status": "initiated",
+  "components": [
+    {
+      "name": "landing-page",
+      "status": "pending",
+      "dependencies": ["string"]
+    }
+  ],
+  "estimatedDuration": "number"
+}
+```
+
+**Error Responses**:
+- `400`: Invalid migration request
+- `409`: Migration already in progress
+
+### GET /api/components/migration/{id}/status
+Check migration status.
+
+**Request**:
+```http
+GET /api/components/migration/{id}/status
+Accept: application/json
+```
+
+**Response**:
+```json
+{
+  "migrationId": "string",
+  "status": "running|completed|failed",
+  "progress": {
+    "completed": "number",
+    "total": "number",
+    "currentComponent": "string"
+  },
+  "errors": ["string"],
+  "completedAt": "2025-09-11T00:00:00Z"
+}
+```
+
+## Data Models
+
+### Component
+```typescript
+interface Component {
+  id: string;
+  name: string;
+  source: string;
+  status: 'migrated' | 'pending' | 'error';
+  dependencies: string[];
+  integrationPoints: string[];
+}
+```
+
+### MigrationRequest
+```typescript
+interface MigrationRequest {
+  source: string;
+  components: string[];
+  target: string;
+}
+```
+
+### MigrationStatus
+```typescript
+interface MigrationStatus {
+  migrationId: string;
+  status: 'running' | 'completed' | 'failed';
+  progress: {
+    completed: number;
+    total: number;
+    currentComponent: string;
+  };
+  errors: string[];
+  completedAt?: string;
+}
+```
+
+## Validation Rules
+
+- Component names must be unique
+- Source URLs must be valid GitHub repositories
+- Target paths must exist in turborepo structure
+- Migration IDs must be UUIDs
+- Status values must be from predefined enums
+
+## Integration Requirements
+
+- Components must integrate with layout.tsx and page.tsx
+- Dependencies must be resolved before migration
+- UI libraries (shadcn, magicui, animate-ui, reacbits) must be available
+- Configuration files must not be modified during migration
+
+---
+
+*Contract generated from functional requirements FR-016, FR-017, FR-018 - Phase 1 execution*</content>
+<parameter name="filePath">/home/dice-wizard/dev/web-design-workbench/specs/001-create-a-specification/contracts/component-migration-api.yaml

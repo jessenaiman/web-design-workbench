@@ -1,0 +1,209 @@
+# API Contract: Testing Validation Service
+
+**Version**: 1.0.0
+**Date**: September 11, 2025
+**Status**: Draft
+
+## Overview
+API contract for validating that the 5 required tests continue to pass throughout the migration process.
+
+## Endpoints
+
+### GET /api/tests/status
+Retrieve current test status and results.
+
+**Request**:
+```http
+GET /api/tests/status
+Accept: application/json
+```
+
+**Response**:
+```json
+{
+  "baseline": {
+    "total": 5,
+    "passing": 5,
+    "failing": 0,
+    "lastRun": "2025-09-11T00:00:00Z"
+  },
+  "current": {
+    "total": 5,
+    "passing": 5,
+    "failing": 0,
+    "lastRun": "2025-09-11T00:00:00Z"
+  },
+  "tests": [
+    {
+      "id": "string",
+      "name": "string",
+      "status": "passed|failed|pending",
+      "duration": "number",
+      "error": "string?"
+    }
+  ]
+}
+```
+
+### POST /api/tests/run
+Execute test suite and validate results.
+
+**Request**:
+```http
+POST /api/tests/run
+Content-Type: application/json
+
+{
+  "scope": "all|unit|integration|e2e",
+  "baseline": true
+}
+```
+
+**Response**:
+```json
+{
+  "runId": "string",
+  "status": "running",
+  "scope": "all",
+  "estimatedDuration": "number",
+  "baselineValidation": true
+}
+```
+
+### GET /api/tests/run/{id}/results
+Retrieve test run results.
+
+**Request**:
+```http
+GET /api/tests/run/{id}/results
+Accept: application/json
+```
+
+**Response**:
+```json
+{
+  "runId": "string",
+  "status": "completed|failed|running",
+  "duration": "number",
+  "results": {
+    "total": 5,
+    "passed": 5,
+    "failed": 0,
+    "skipped": 0
+  },
+  "tests": [
+    {
+      "id": "string",
+      "name": "string",
+      "status": "passed",
+      "duration": "number",
+      "output": "string",
+      "error": null
+    }
+  ],
+  "baseline": {
+    "maintained": true,
+    "deviations": []
+  }
+}
+```
+
+### POST /api/tests/validate-migration
+Validate that migration changes don't break existing tests.
+
+**Request**:
+```http
+POST /api/tests/validate-migration
+Content-Type: application/json
+
+{
+  "changes": [
+    "migrated landing-page component",
+    "installed shadcn library",
+    "updated navigation components"
+  ],
+  "baselineTests": ["test1", "test2", "test3", "test4", "test5"]
+}
+```
+
+**Response**:
+```json
+{
+  "validationId": "string",
+  "status": "passed|failed|warnings",
+  "changes": [
+    {
+      "description": "migrated landing-page component",
+      "impact": "low",
+      "testsAffected": []
+    }
+  ],
+  "recommendations": [
+    "Run full test suite before deployment",
+    "Monitor component integration tests"
+  ]
+}
+```
+
+## Data Models
+
+### TestStatus
+```typescript
+interface TestStatus {
+  baseline: TestResults;
+  current: TestResults;
+  tests: TestInfo[];
+}
+```
+
+### TestResults
+```typescript
+interface TestResults {
+  total: number;
+  passing: number;
+  failing: number;
+  lastRun: string;
+}
+```
+
+### TestInfo
+```typescript
+interface TestInfo {
+  id: string;
+  name: string;
+  status: 'passed' | 'failed' | 'pending';
+  duration: number;
+  error?: string;
+}
+```
+
+### MigrationValidation
+```typescript
+interface MigrationValidation {
+  validationId: string;
+  status: 'passed' | 'failed' | 'warnings';
+  changes: ChangeImpact[];
+  recommendations: string[];
+}
+```
+
+## Validation Rules
+
+- Total tests must always be 5
+- All 5 tests must pass for successful validation
+- Test run IDs must be UUIDs
+- Baseline must be established before migration
+- Changes must be documented for impact assessment
+
+## Integration Requirements
+
+- Tests must run before any migration changes
+- Test results must be preserved for comparison
+- Baseline validation must occur after each major change
+- Test failures must block deployment
+- Migration changes must not break existing functionality
+
+---
+
+*Contract generated from functional requirements FR-023, TR-001 through TR-008 - Phase 1 execution*</content>
+<parameter name="filePath">/home/dice-wizard/dev/web-design-workbench/specs/001-create-a-specification/contracts/testing-validation-api.yaml

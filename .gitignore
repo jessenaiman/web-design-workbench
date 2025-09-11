@@ -57,3 +57,7 @@ next-env.d.ts
 todos.md
 task.md
 temp
+
+
+#Ignore vscode AI rules
+.github/instructions/codacy.instructions.md
